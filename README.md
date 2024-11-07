@@ -44,7 +44,12 @@ rm -rf src
 git init
 git remote add origin https://github.com/pmy911/4300-group-project
 git pull origin main
+
+# Set the upstream branch to enable pushing files
+git branch --set-upstream-to=origin/main main
 ```
+
+> **Note**: Run `git branch --set-upstream-to=origin/main main` to ensure you can push files to the repository.
 
 Run the development server:
 
