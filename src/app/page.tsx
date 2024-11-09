@@ -1,7 +1,28 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import styles from './globals.css'; // Ensure this is imported if using CSS module or tailwind
+import React from 'react';
 
 export default function Home() {
-
+    return (
+        <div className="flex flex-col space-y-2.5 min-h-screen">
+            <div className='flex flex-row justify-between p-1 items-center'>
+                <Image
+                    src="/images/logo.png"
+                    alt="syncro logo"
+                    width={150}
+                    height={30}
+                    priority
+                />
+                <p className={'text-4xl'}>Login/Sign Up</p>
+            </div>
+            <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>
+            <div className="flex flex-grow p-10 items-center">
+                <div className={'text-[125px] leading-tight'}>
+                    <p>scheduling</p>
+                    <p>made</p>
+                    <p>simple.</p>
+                </div>
+            </div>
+        </div>
+    );
 }
