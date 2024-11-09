@@ -14,16 +14,12 @@ export default function Home() {
                     priority
                 />
                 <Link href="/login">
-                    <p className={'text-4xl cursor-pointer'}>login/signup</p>
+                    <p className={'text-4xl cursor-pointer border border-[#232323] p-3 rounded'}>login/signup</p>
                 </Link>
             </div>
             <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>
-            <div className="flex flex-grow p-10 items-center">
-                <div className={'text-[125px] leading-tight'}>
-                    <p>scheduling</p>
-                    <p>made</p>
-                    <p>simple.</p>
-                </div>
+            <div className="flex flex-grow p-10">
+
             </div>
         </div>
     );
