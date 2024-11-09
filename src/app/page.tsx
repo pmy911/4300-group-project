@@ -14,7 +14,7 @@ export default function Home() {
                     priority
                 />
                 <Link href="/login">
-                    <p className={'text-4xl cursor-pointer'}>Login/Sign Up</p>
+                    <p className={'text-4xl cursor-pointer'}>login/signup</p>
                 </Link>
             </div>
             <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>
