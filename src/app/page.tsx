@@ -13,7 +13,9 @@ export default function Home() {
                     height={30}
                     priority
                 />
-                <p className={'text-4xl'}>Login/Sign Up</p>
+                <Link href="/login">
+                    <p className={'text-4xl cursor-pointer'}>Login/Sign Up</p>
+                </Link>
             </div>
             <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>
             <div className="flex flex-grow p-10 items-center">
