@@ -18,8 +18,12 @@ export default function Home() {
                 </Link>
             </div>
             <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>
-            <div className="flex flex-grow p-10">
-
+            <div className="flex flex-grow p-10 items-center">
+                <div className={'text-[125px] leading-tight'}>
+                    <p>scheduling</p>
+                    <p>made</p>
+                    <p>simple.</p>
+                </div>
             </div>
         </div>
     );
