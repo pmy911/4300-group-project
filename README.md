@@ -8,12 +8,6 @@
 
 Syncro is a simple calendar app that allows users to schedule tasks and events. It helps users organize their time effectively and manage their daily activities with ease.
 
-## Table of Contents
-
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Features](#features)
-
 ## Installation
 
 Follow these steps to install and set up the project:
@@ -48,6 +42,11 @@ git pull origin main
 
 # Set the upstream branch to enable pushing files
 git branch --set-upstream-to=origin/main main
+
+# only push source code
+git add src
+git commit -m 'commit message'
+git push
 ```
 
 > **Note**: Run `git branch --set-upstream-to=origin/main main` to ensure you can push files to the repository.
@@ -65,13 +64,3 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Usage
-
-Provide instructions and examples for using your project. Include screenshots or code snippets to make it easier for users to understand.
-
-## Features
-
-- Schedule tasks and events easily
-- View and manage your daily and upcoming schedules
-- User-friendly interface for quick navigation
