@@ -1,7 +1,7 @@
 'use client'
-import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import Logo from "@/app/components/Logo";
 
 // The main Tasks component that displays the authenticated view with a weekly calendar layout
 export default function Tasks() {
@@ -57,13 +57,7 @@ export default function Tasks() {
             {/* Header section with navigation and logo */}
             <div className='flex flex-row justify-between p-1 items-center text-4xl'>
                 <Link href="/tasks">
-                    <Image
-                        src="/images/logo.png" // Path to the logo image
-                        alt="syncro logo" // Alt text for the logo image
-                        width={150} // Width of the image
-                        height={30} // Height of the image
-                        priority // Load the image with high priority
-                    />
+                    <Logo/>
                 </Link>
                 {/* Display the current month */}
                 <p className={'border border-[#232323] p-3 rounded'}>{currentDate.toLocaleString('default', { month: 'long' })}</p>

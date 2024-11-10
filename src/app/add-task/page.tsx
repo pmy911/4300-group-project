@@ -1,8 +1,8 @@
-'use client'
-import Image from 'next/image';
+"use client"
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import Logo from "@/app/components/Logo";
 
 // Interface to define the structure of the form data
 interface FormData {
@@ -107,13 +107,7 @@ export default function AddTask() {
         <div className="flex flex-col space-y-2.5 min-h-screen">
             {/* Header with logo */}
             <div className='flex flex-row p-1 justify-center items-center'>
-                <Image
-                    src="/images/logo.png" // Path to the logo image
-                    alt="syncro logo" // Alt text for accessibility
-                    width={150} // Width of the image
-                    height={30} // Height of the image
-                    priority // Load with high priority
-                />
+                <Logo/>
             </div>
             {/* Divider line below the header */}
             <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import Logo from "@/app/components/Logo";
 
 // The main Home component that renders the unauthenticated home page
 export default function Home() {
@@ -17,13 +18,7 @@ export default function Home() {
             {/* Header section with the logo and login/signup link */}
             <div className='flex flex-row justify-between p-1 items-center'>
                 {/* Logo image */}
-                <Image
-                    src="/images/logo.png" // Path to the logo image
-                    alt="syncro logo" // Alt text for accessibility
-                    width={150} // Width of the image
-                    height={30} // Height of the image
-                    priority // Ensures the image is loaded with high priority
-                />
+                <Logo/>
                 {/* Link to the login/signup page */}
                 <Link href="/login">
                     <p className={'text-4xl cursor-pointer border border-[#232323] p-3 rounded'}>login/signup</p>

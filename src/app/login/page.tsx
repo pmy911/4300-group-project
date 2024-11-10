@@ -1,8 +1,8 @@
 'use client'
-import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Logo from "@/app/components/Logo";
 
 // The Login component handles both login and signup functionality
 export default function Login() {
@@ -42,13 +42,7 @@ export default function Login() {
             {/* Header section with a logo and link back to the home page */}
             <div className='flex flex-row p-1 justify-center items-center'>
                 <Link href="/">
-                    <Image
-                        src="/images/logo.png" // Path to the logo image
-                        alt="syncro logo" // Alt text for the logo image
-                        width={150} // Width of the image
-                        height={30} // Height of the image
-                        priority // Load the image with high priority
-                    />
+                    <Logo/>
                 </Link>
             </div>
             {/* Divider line below the header */}
