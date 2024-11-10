@@ -39,6 +39,7 @@ Ensure you have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/)
 ```bash
 # Remove the current `src` folder
 rm -rf src
+rm -rf public
 
 # Pull the entire repository content
 git init
