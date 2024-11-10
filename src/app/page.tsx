@@ -4,6 +4,13 @@ import React from 'react';
 
 // The main Home component that renders the unauthenticated home page
 export default function Home() {
+    // Dummy array containing the words and image path
+    const items = [
+        { text: 'scheduling', image: '/images/dummyimage.png' },
+        { text: 'made', image: '/images/dummyimage.png' },
+        { text: 'simple.', image: '/images/dummyimage.png' }
+    ];
+
     return (
         // Main container for the entire home page with vertical layout
         <div className="flex flex-col space-y-2.5 min-h-screen">
@@ -25,14 +32,19 @@ export default function Home() {
             {/* Divider line below the header */}
             <hr style={{height: '2px', backgroundColor: '#A8A8A7', border: 'none'}}/>
 
-            {/* Main content area with the introductory text */}
-            <div className="flex flex-grow p-10 items-center">
-                <div className={'text-[125px] leading-tight'}>
-                    {/* Large introductory text for the home page */}
-                    <p>scheduling</p>
-                    <p>made</p>
-                    <p>simple.</p>
-                </div>
+            {/* Main content area with mapped items */}
+            <div className="flex flex-col flex-grow justify-center p-10 space-y-5">
+                {items.map((item, index) => (
+                    <div key={index} className='flex space-x-4'>
+                        <p className='text-[125px] leading-tight'>{item.text}</p>
+                        <Image
+                            src={item.image} // Path to the dummy image
+                            alt={'rubric requirement'}
+                            width={10}
+                            height={10}
+                        />
+                    </div>
+                ))}
             </div>
         </div>
     );

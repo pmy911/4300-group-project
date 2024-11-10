@@ -46,7 +46,7 @@ export default function AddTask() {
     });
 
     // Handle changes in form input fields
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
 
         // Special handling for checkbox input
@@ -85,9 +85,21 @@ export default function AddTask() {
     };
 
     // Handle form submission
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission
-        console.log(formData); // Log the form data (replace with actual submit logic)
+        console.log(formData); // Log the form data
+
+        // Reset form fields to initial state
+        setFormData({
+            title: '',
+            startDate: getDefaultDateTime().startDate,
+            startTime: getDefaultDateTime().startTime,
+            endDate: getDefaultDateTime().startDate,
+            endTime: getDefaultDateTime().endTime,
+            description: '',
+            allDay: false,
+        });
+
         router.push('/tasks'); // Navigate to the tasks page after submission
     };
 
@@ -112,7 +124,7 @@ export default function AddTask() {
                 <Link href="/tasks">
                     <p className={'text-4xl cursor-pointer'}>×</p>
                 </Link>
-                <form onSubmit={handleSubmit} className="w-full max-w-[40%] space-y-4 text-left">
+                <form onSubmit={onSubmit} className="w-full max-w-[40%] space-y-4 text-left">
                     {/* Title input field */}
                     <div className="flex flex-col space-y-2 text-3xl">
                         <input
@@ -120,7 +132,7 @@ export default function AddTask() {
                             id="title"
                             name="title"
                             value={formData.title}
-                            onChange={handleChange} // Update state on change
+                            onChange={onChange} // Update state on change
                             placeholder="Add title"
                             className="border border-transparent bg-[#E4E2DD] p-2 rounded placeholder-[#232323]"
                             required // Mark field as required
@@ -136,7 +148,7 @@ export default function AddTask() {
                                     id="startDate"
                                     name="startDate"
                                     value={formData.startDate}
-                                    onChange={handleChange} // Update state on change
+                                    onChange={onChange} // Update state on change
                                     className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
                                     required // Mark field as required
                                 />
@@ -147,7 +159,7 @@ export default function AddTask() {
                                     id="startTime"
                                     name="startTime"
                                     value={formData.startTime}
-                                    onChange={handleChange} // Update state on change
+                                    onChange={onChange} // Update state on change
                                     className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
                                     required // Mark field as required
                                 />
@@ -161,7 +173,7 @@ export default function AddTask() {
                                     id="endDate"
                                     name="endDate"
                                     value={formData.endDate}
-                                    onChange={handleChange} // Update state on change
+                                    onChange={onChange} // Update state on change
                                     className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
                                     required // Mark field as required
                                 />
@@ -172,7 +184,7 @@ export default function AddTask() {
                                     id="endTime"
                                     name="endTime"
                                     value={formData.endTime}
-                                    onChange={handleChange} // Update state on change
+                                    onChange={onChange} // Update state on change
                                     className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
                                     required // Mark field as required
                                 />
@@ -186,7 +198,7 @@ export default function AddTask() {
                             id="allDay"
                             name="allDay"
                             checked={formData.allDay}
-                            onChange={handleChange} // Update state on change
+                            onChange={onChange} // Update state on change
                             className="cursor-pointer"
                         />
                         <label htmlFor="allDay" className="cursor-pointer">All Day</label>
@@ -199,7 +211,7 @@ export default function AddTask() {
                             id="description"
                             name="description"
                             value={formData.description}
-                            onChange={handleChange} // Update state on change
+                            onChange={onChange} // Update state on change
                             placeholder="Add description..."
                             className="border border-[#232323] bg-[#E4E2DD] placeholder-[#232323] p-2 rounded h-32"
                         />
