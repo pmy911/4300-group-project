@@ -20,7 +20,7 @@ export default function Login() {
     const router = useRouter();
 
     // Handle change in form input fields
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         // Update the state with the new input value
         setFormData({
@@ -30,7 +30,7 @@ export default function Login() {
     };
 
     // Handle form submission
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission behavior
         console.log(isSignup ? 'Signup data:' : 'Login data:', formData); // Log form data for now
         // Navigate to the '/tasks' page after submission
@@ -68,7 +68,7 @@ export default function Login() {
             <div className='flex justify-center items-center min-h-[70vh]'>
                 <div className='bg-[#E4E2DD] p-10 rounded w-[350px] border border-[#232323]'>
                     <h2 className='text-3xl mb-5 text-center'>{isSignup ? 'Signup' : 'Login'}</h2> {/* Form title */}
-                    <form onSubmit={handleSubmit} className='space-y-4'>
+                    <form onSubmit={onSubmit} className='space-y-4'>
                         {/* Name input field, visible only for signup */}
                         {isSignup && (
                             <div className='flex flex-col text-2xl'>
@@ -78,7 +78,7 @@ export default function Login() {
                                     id='name'
                                     name='name'
                                     value={formData.name}
-                                    onChange={handleChange} // Update state on change
+                                    onChange={onChange} // Update state on change
                                     className='border border-[#232323] bg-[#E4E2DD] p-2 rounded mt-1'
                                     required // Mark field as required
                                 />
@@ -93,7 +93,7 @@ export default function Login() {
                                 id='email'
                                 name='email'
                                 value={formData.email}
-                                onChange={handleChange} // Update state on change
+                                onChange={onChange} // Update state on change
                                 className='border border-[#232323] bg-[#E4E2DD] p-2 rounded mt-1'
                                 required // Mark field as required
                             />
@@ -107,7 +107,7 @@ export default function Login() {
                                 id='password'
                                 name='password'
                                 value={formData.password}
-                                onChange={handleChange} // Update state on change
+                                onChange={onChange} // Update state on change
                                 className='border border-[#232323] bg-[#E4E2DD] p-2 rounded mt-1'
                                 required // Mark field as required
                             />

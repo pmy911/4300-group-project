@@ -87,7 +87,7 @@ export default function AddTask() {
     // Handle form submission
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission
-        console.log(formData); // Log the form data
+        console.log(formData); // Log the form data for now
 
         // Reset form fields to initial state
         setFormData({
