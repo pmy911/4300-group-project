@@ -31,7 +31,7 @@ npx create-next-app@latest .
 Ensure you have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed before running the commands.
 
 ```bash
-# Remove the current `src` folder
+# Remove the current `src` and `public` folders
 rm -rf src
 rm -rf public
 
