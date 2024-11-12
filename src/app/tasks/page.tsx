@@ -35,14 +35,14 @@ export default function Tasks() {
     });
 
     // Function to navigate to the previous week
-    const handlePreviousWeek = (): void => {
+    const onPreviousWeek = (): void => {
         const prevWeek = new Date(currentDate);
         prevWeek.setDate(currentDate.getDate() - 7); // Subtract 7 days
         setCurrentDate(prevWeek);
     };
 
     // Function to navigate to the next week
-    const handleNextWeek = (): void => {
+    const onNextWeek = (): void => {
         const nextWeek = new Date(currentDate);
         nextWeek.setDate(currentDate.getDate() + 7); // Add 7 days
         setCurrentDate(nextWeek);
@@ -62,13 +62,13 @@ export default function Tasks() {
                 {/* Display the current month */}
                 <p className={'border border-[#232323] p-3 rounded'}>{currentDate.toLocaleString('default', { month: 'long' })}</p>
                 {/* Button to navigate to the previous week */}
-                <p className={'text-6xl cursor-pointer px-6'} onClick={handlePreviousWeek}>‹</p>
+                <p className={'text-6xl cursor-pointer px-6'} onClick={onPreviousWeek}>‹</p>
                 {/* Link to add a new task */}
                 <Link href='/add-task'>
                     <p className={'text-5xl border border-[#232323] py-3 px-4 rounded'}>+</p>
                 </Link>
                 {/* Button to navigate to the next week */}
-                <p className={'text-6xl px-6 cursor-pointer'} onClick={handleNextWeek}>›</p>
+                <p className={'text-6xl px-6 cursor-pointer'} onClick={onNextWeek}>›</p>
                 {/* Display the current year */}
                 <p className={'border border-[#232323] p-3 rounded'}>{currentDate.getFullYear()}</p>
                 {/* Link to log out */}
