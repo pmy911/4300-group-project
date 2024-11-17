@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
 // Define the Task interface
 interface ITask extends Document {
@@ -10,6 +10,7 @@ interface ITask extends Document {
     endTime: string;      // End time of the task (HH:mm format)
     allDay: boolean;      // Indicates if the task is an all-day event
     created_at: Date;     // Timestamp of task creation
+    user: Types.ObjectId; // Reference to the User document
 }
 
 // Define the Task schema
@@ -49,6 +50,11 @@ const taskSchema = new Schema<ITask>({
     created_at: {
         type: Date,
         default: Date.now, // Automatically set the creation timestamp
+    },
+    user: {
+        type: Schema.Types.ObjectId, // References a User document
+        ref: 'User',                // Name of the User model
+        required: true,             // Each task must belong to a user
     },
 });
 
