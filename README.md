@@ -51,6 +51,15 @@ git push
 
 > **Note**: Run `git branch --set-upstream-to=origin/main main` to ensure you can push files to the repository.
 
+Additionally, install the following dependencies:
+
+```bash
+npm install--save mongoose
+npm install dotenv
+npm install bcrypt
+npm install --save-dev @types/bcrypt
+```
+
 Run the development server:
 
 ```bash
