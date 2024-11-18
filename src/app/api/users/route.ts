@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "User added successfully" }, { status: 201 });
 }
 
-// export async function GET() {
-//     await connectMongoDB();
-//     const users = await User.find();
-//     return NextResponse.json({ users });
-// }
+export async function GET() {
+    await connectMongoDB();
+    const users = await User.find();
+    return NextResponse.json({ users });
+}

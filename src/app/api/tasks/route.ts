@@ -20,8 +20,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Task added successfully" }, { status: 201 });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('user'); // Retrieve the `user` query parameter
     await connectMongoDB();
-    const tasks = await Task.find();
-    return NextResponse.json({ tasks });
+    if (!userId) {
+        return NextResponse.json({ message: "User ID is required" }, { status: 400 });
+    }
+    const tasks = await Task.find({ user: userId }); // Find tasks for the specific user
+    return NextResponse.json({ tasks }, { status: 200 });
 }
