@@ -6,7 +6,7 @@ interface IUser extends Document {
     email: string;      // The user's email
     password: string;   // The user's hashed password
     created_at: Date;   // Timestamp of user creation
-    //tasks: [Schema.Types.ObjectId];       // Array of tasks, needed to use populate() method
+    tasks: [Schema.Types.ObjectId];       // Array of tasks, needed to use populate() method
 }
 
 // Define the User schema
@@ -32,7 +32,7 @@ const userSchema = new Schema<IUser>({
         type: Date,
         default: Date.now, // Automatically set the creation timestamp
     },
-    //tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }] // Makes it work with the populate() method
+    tasks: [{ type: Schema.Types.ObjectId, ref: 'Task' }] // Makes it work with the populate() method
 });
 
 // Export the User model, creating it only if it doesn’t already exist
