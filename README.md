@@ -58,6 +58,10 @@ npm install--save mongoose
 npm install dotenv
 npm install bcrypt
 npm install --save-dev @types/bcrypt
+npm install next-auth@beta
+npx auth secret 
+npm i bcryptjs         
+npm install --save-dev @types/bcryptjs
 ```
 
 Run the development server:
