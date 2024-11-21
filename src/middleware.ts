@@ -1,3 +1,4 @@
+// src/middleware.ts
 import { NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
 import NextAuth from "next-auth";
@@ -10,17 +11,21 @@ export async function middleware(request: any) {
     const isAuthenticated = !!session?.user;
     console.log(isAuthenticated, nextUrl.pathname);
 
-    const reqUrl = new URL(request.url);
-    if (!isAuthenticated && reqUrl.pathname !== "/") {
+    // List of protected routes
+    const protectedRoutes = ['/tasks', '/add-task', '/edit-task'];
+
+    // Check if the requested path is a protected route
+    if (!isAuthenticated && protectedRoutes.some(route => nextUrl.pathname.startsWith(route))) {
         return NextResponse.redirect(new URL("/", request.url));
     }
+
     return NextResponse.next();
 }
 
 export const config = {
     matcher: [
-        "/add-task/",
-        "/edit-task/:path*",
-        "/tasks/"
+        "/tasks/:path*",
+        "/add-task/:path*",
+        "/edit-task/:path*"
     ]
 };
