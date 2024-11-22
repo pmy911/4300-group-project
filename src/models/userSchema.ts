@@ -26,6 +26,7 @@ const userSchema = new Schema<IUser>({
     password: {
         type: String,
         required: true,   // Password is required
+        select: false,
         minlength: 6,     // Set a minimum length for security
     },
     created_at: {
