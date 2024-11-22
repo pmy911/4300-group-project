@@ -19,6 +19,12 @@ interface Task {
     user: string;
 }
 
+interface TaskPosition {
+    top: number;
+    height: number;
+    task: Task;
+}
+
 export default function Tasks() {
     const { data: session } = useSession();
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
@@ -89,72 +95,93 @@ export default function Tasks() {
         setCurrentDate(nextWeek);
     };
 
-    // Add debug logging to getTasksForTimeSlot
-    const getTasksForTimeSlot = (date: Date, hour: number): Task[] => {
+    const getTasksForTimeSlot = (date: Date, hour: number): TaskPosition[] => {
         const slotStart = new Date(date);
         slotStart.setHours(hour, 0, 0, 0);
         const slotEnd = new Date(date);
         slotEnd.setHours(hour + 1, 0, 0, 0);
 
-        return tasks.filter(task => {
-            // Convert task dates to Date objects if they're strings
-            const taskStartDate = new Date(task.startDate);
-            const taskEndDate = new Date(task.endDate);
+        return tasks
+            .filter(task => {
+                // Convert task dates to Date objects
+                const taskStartDate = new Date(task.startDate);
+                const taskEndDate = new Date(task.endDate);
 
-            // Create Date objects for the full task start and end times
-            const taskStart = new Date(taskStartDate);
-            const [startHour, startMinute] = task.startTime.split(':');
-            taskStart.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
+                // Set the time components
+                const taskStart = new Date(taskStartDate);
+                const [startHour, startMinute] = task.startTime.split(':');
+                taskStart.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
 
-            const taskEnd = new Date(taskEndDate);
-            const [endHour, endMinute] = task.endTime.split(':');
-            taskEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
+                const taskEnd = new Date(taskEndDate);
+                const [endHour, endMinute] = task.endTime.split(':');
+                taskEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
-            // Debug logging
-            console.log('Checking task:', {
-                title: task.title,
-                date: date.toISOString(),
-                hour,
-                slotStart: slotStart.toISOString(),
-                slotEnd: slotEnd.toISOString(),
-                taskStart: taskStart.toISOString(),
-                taskEnd: taskEnd.toISOString()
-            });
+                // Check if this slot is within the task's time range
+                return (
+                    (taskStart <= slotEnd && taskEnd > slotStart) ||
+                    (task.allDay &&
+                        taskStartDate.toDateString() === date.toDateString())
+                );
+            })
+            .map(task => {
+                // Calculate position and height for the task
+                const taskStartDate = new Date(task.startDate);
+                const taskEndDate = new Date(task.endDate);
 
-            // Check if task overlaps with the time slot
-            const isInSlot = (taskStart < slotEnd && taskEnd > slotStart) ||
-                (task.allDay &&
-                    taskStartDate.toDateString() === date.toDateString());
+                const taskStart = new Date(taskStartDate);
+                const [startHour, startMinute] = task.startTime.split(':');
+                taskStart.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
 
-            console.log('Task in slot?', isInSlot);
-            return isInSlot;
-        });
+                const taskEnd = new Date(taskEndDate);
+                const [endHour, endMinute] = task.endTime.split(':');
+                taskEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
+
+                // Only show the task if this is its starting hour
+                if (hour !== parseInt(startHour)) {
+                    return null;
+                }
+
+                // Calculate task duration in hours
+                const durationHours = (taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60);
+
+                // Calculate position properties
+                const minuteOffset = parseInt(startMinute);
+                const topPercentage = (minuteOffset / 60) * 100;
+                const heightPercentage = (durationHours * 100);
+
+                return {
+                    top: topPercentage,
+                    height: heightPercentage,
+                    task: task
+                };
+            })
+            .filter((position): position is TaskPosition => position !== null);
     };
 
-    // Component to render a single task in the grid
-    const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
+    // Update the TaskItem component
+    const TaskItem: React.FC<{ position: TaskPosition }> = ({ position }) => {
         const router = useRouter();
 
         const handleClick = () => {
-            router.push(`/edit-task/${task._id}`);
+            router.push(`/edit-task/${position.task._id}`);
         };
 
         return (
             <div
                 onClick={handleClick}
                 className="absolute left-0 right-0 bg-blue-200 border border-blue-300 rounded px-1
-                     overflow-hidden text-xs cursor-pointer hover:bg-blue-300 transition-colors"
+                         overflow-hidden text-xs cursor-pointer hover:bg-blue-300 transition-colors"
                 style={{
-                    top: '2px',
-                    bottom: '2px',
+                    top: `${position.top}%`,
+                    height: `${position.height}%`,
                     zIndex: 10
                 }}
-                title={`${task.title}${task.description ? '\n' + task.description : ''}`}
+                title={`${position.task.title}${position.task.description ? '\n' + position.task.description : ''}`}
             >
-            <span className="block truncate">
-                {task.allDay ? '📅 ' : '🕒 '}
-                {task.title}
-            </span>
+                <span className="block truncate">
+                    {position.task.allDay ? '📅 ' : '🕒 '}
+                    {position.task.title}
+                </span>
             </div>
         );
     };
@@ -209,9 +236,13 @@ export default function Tasks() {
                         {hours.map((hour) => (
                             <React.Fragment key={hour.value}>
                                 {weekDates.map((date, dateIndex) => (
-                                    <div key={`${hour.value}-${dateIndex}`} className="border border-[#A8A8A7] h-10 relative">
-                                        {getTasksForTimeSlot(date, hour.value).map((task) => (
-                                            <TaskItem key={task._id} task={task} />
+                                    <div key={`${hour.value}-${dateIndex}`}
+                                         className="border border-[#A8A8A7] h-10 relative">
+                                        {getTasksForTimeSlot(date, hour.value).map((position) => (
+                                            <TaskItem
+                                                key={position.task._id}
+                                                position={position}
+                                            />
                                         ))}
                                     </div>
                                 ))}
