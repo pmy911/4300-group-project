@@ -9,14 +9,20 @@ export async function middleware(request: any) {
     const { nextUrl } = request;
     const session = await auth();
     const isAuthenticated = !!session?.user;
-    console.log(isAuthenticated, nextUrl.pathname);
+    const isAuthPage = nextUrl.pathname.startsWith('/login');
 
-    // List of protected routes
-    const protectedRoutes = ['/tasks', '/add-task', '/edit-task'];
+    // If we're on an auth page and already logged in, redirect to tasks
+    if (isAuthPage && isAuthenticated) {
+        return NextResponse.redirect(new URL('/tasks', request.url));
+    }
 
-    // Check if the requested path is a protected route
-    if (!isAuthenticated && protectedRoutes.some(route => nextUrl.pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL("/", request.url));
+    // If we're not authenticated and trying to access protected routes
+    if (!isAuthenticated &&
+        ['/tasks', '/add-task', '/edit-task'].some(route =>
+            nextUrl.pathname.startsWith(route))) {
+        // Store the attempted URL to redirect back after login
+        const encodedFrom = encodeURIComponent(nextUrl.pathname);
+        return NextResponse.redirect(new URL(`/login?from=${encodedFrom}`, request.url));
     }
 
     return NextResponse.next();
@@ -26,6 +32,7 @@ export const config = {
     matcher: [
         "/tasks/:path*",
         "/add-task/:path*",
-        "/edit-task/:path*"
+        "/edit-task/:path*",
+        "/login"
     ]
 };
