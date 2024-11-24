@@ -37,11 +37,11 @@ git add ./src ./public ./README.md
 git commit -m "Deleted default source code"
 
 # Pull the entire repository content
-git checkout -b main
+git branch -M main
 git remote add origin https://github.com/pmy911/4300-group-project
-# Add commit message when prompted:
-git pull origin main --allow-unrelated-histories
-git branch -d master
+git pull origin main --rebase
+git add ./src ./public ./README.md
+git commit -m "Added project source code"
 
 # Set the upstream branch to enable pushing files
 git branch --set-upstream-to=origin/main main
