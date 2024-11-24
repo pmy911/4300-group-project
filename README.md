@@ -38,7 +38,7 @@ rm -rf public
 # Pull the entire repository content
 git init
 git remote add origin https://github.com/pmy911/4300-group-project
-git pull origin main
+git pull origin main --allow-unrelated-histories
 
 # Set the upstream branch to enable pushing files
 git branch --set-upstream-to=origin/main main
