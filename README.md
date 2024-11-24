@@ -31,15 +31,10 @@ npx create-next-app@latest .
 Ensure you have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed before running the commands.
 
 ```bash
-# Remove the current `src` and `public` folders
-rm -rf ./src ./public ./README.md
-git add ./src ./public ./README.md
-git commit -m "Deleted default source code"
-
 # Pull the entire repository content
 git branch -M main
 git remote add origin https://github.com/pmy911/4300-group-project
-git pull origin main --rebase
+git pull origin main --allow-unrelated-histories
 git add ./src ./public ./README.md
 git commit -m "Added project source code"
 
