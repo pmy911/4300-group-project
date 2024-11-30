@@ -14,6 +14,7 @@ interface FormData {
     endDate: string;
     endTime: string;
     description: string;
+    imageUrl: string;
     allDay: boolean;
 }
 
@@ -50,6 +51,7 @@ export default function AddTask() {
         endDate: getDefaultDateTime().startDate,
         endTime: getDefaultDateTime().endTime,
         description: "",
+        imageUrl: "",
         allDay: false,
     });
 
@@ -252,12 +254,27 @@ export default function AddTask() {
                     {/* Event details */}
                     <div className="flex flex-col space-y-2 py-5">
                         <label className="font-bold text-3xl" htmlFor="description">Event Details</label>
+                        <hr style={{ height: '2px', backgroundColor: '#232323', border: 'none' }} />
                         <textarea
                             id="description"
                             name="description"
                             value={formData.description}
                             onChange={onChange}
                             placeholder="Add description..."
+                            className="border border-[#232323] bg-[#E4E2DD] placeholder-[#232323] p-2 rounded h-32"
+                        />
+                    </div>
+
+                    {/* Image URL */}
+                    <div className="flex flex-col space-y-2 py-5">
+                        <label className="font-bold text-3xl" htmlFor="imageUrl">Image URL</label>
+                        <hr style={{ height: '2px', backgroundColor: '#232323', border: 'none' }} />
+                        <textarea
+                            id="imageUrl"
+                            name="imageUrl"
+                            value={formData.imageUrl}
+                            onChange={onChange}
+                            placeholder="Add image URL..."
                             className="border border-[#232323] bg-[#E4E2DD] placeholder-[#232323] p-2 rounded h-32"
                         />
                     </div>

@@ -61,11 +61,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
     const { id } = params;
 
-    // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return NextResponse.json(
             { error: "Invalid ID format." },
-            { status: 400 } // Bad Request
+            { status: 400 }
         );
     }
 
@@ -78,20 +77,18 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
             endDate,
             endTime,
             allDay,
+            imageUrl,
         } = await request.json();
 
-        // Validate required fields
         if (!title || !startDate || !startTime || !endDate || !endTime) {
             return NextResponse.json(
                 { error: "Missing required fields." },
-                { status: 400 } // Bad Request
+                { status: 400 }
             );
         }
 
-        // Connect to MongoDB
         await connectMongoDB();
 
-        // Update the task by ID
         const updatedTask = await Task.findByIdAndUpdate(
             id,
             {
@@ -102,26 +99,26 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
                 endDate,
                 endTime,
                 allDay,
+                imageUrl,
             },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
         if (!updatedTask) {
             return NextResponse.json(
                 { error: "Task not found." },
-                { status: 404 } // Not Found
+                { status: 404 }
             );
         }
 
         return NextResponse.json(
             { message: "Task updated successfully.", task: updatedTask },
-            { status: 200 } // OK
+            { status: 200 }
         );
     } catch (error) {
-        // Handle unexpected errors
         return NextResponse.json(
             { error: "Internal Server Error. Please try again later." },
-            { status: 500 } // Internal Server Error
+            { status: 500 }
         );
     }
 }

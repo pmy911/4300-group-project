@@ -72,6 +72,8 @@ export default function Tasks() {
      */
     const getStartOfWeek = (date: Date): Date => {
         const start = new Date(date);
+        // Add timezone offset to keep the date in local time
+        start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
         start.setDate(date.getDate() - date.getDay());
         start.setHours(0, 0, 0, 0);
         return start;
@@ -123,28 +125,35 @@ export default function Tasks() {
 
         return tasks
             .filter(task => {
-                const taskStartDate = new Date(task.startDate);
-                const taskEndDate = new Date(task.endDate);
+                // Convert UTC date to local time by adding timezone offset
+                const taskDate = new Date(task.startDate);
+                taskDate.setMinutes(taskDate.getMinutes() + taskDate.getTimezoneOffset());
 
-                const taskStart = new Date(taskStartDate);
+                // Format both dates to compare just the date portion
+                const taskDateString = taskDate.toISOString().split('T')[0];
+                const slotDateString = date.toISOString().split('T')[0];
+
+                const taskStart = new Date(taskDate);
                 const [startHour, startMinute] = task.startTime.split(':');
                 taskStart.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
 
-                const taskEnd = new Date(taskEndDate);
+                const taskEnd = new Date(taskDate); // Use same base date for end
                 const [endHour, endMinute] = task.endTime.split(':');
                 taskEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 
                 return (
-                    (taskStart <= slotEnd && taskEnd > slotStart) || // Task overlaps with this slot
-                    (task.allDay && taskStartDate.toDateString() === date.toDateString())
+                    (taskDateString === slotDateString &&
+                        (task.allDay || (taskStart <= slotEnd && taskEnd > slotStart)))
                 );
             })
             .map(task => {
                 const taskStart = new Date(task.startDate);
+                taskStart.setMinutes(taskStart.getMinutes() + taskStart.getTimezoneOffset());
                 const [startHour, startMinute] = task.startTime.split(':');
                 taskStart.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
 
-                const taskEnd = new Date(task.endDate);
+                const taskEnd = new Date(task.startDate);
+                taskEnd.setMinutes(taskEnd.getMinutes() + taskEnd.getTimezoneOffset());
                 const [endHour, endMinute] = task.endTime.split(':');
                 taskEnd.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
 

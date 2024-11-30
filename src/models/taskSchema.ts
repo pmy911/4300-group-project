@@ -4,6 +4,7 @@ import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 interface ITask extends Document {
     title: string;       // Title of the task
     description?: string; // Optional description of the task
+    imageUrl?: string;    // Optional URL for an associated image
     startDate: Date;      // Start date of the task
     startTime: string;    // Start time of the task (HH:mm format)
     endDate: Date;        // End date of the task
@@ -23,6 +24,17 @@ const taskSchema = new Schema<ITask>({
     description: {
         type: String,
         trim: true,       // Removes whitespace (optional field)
+    },
+    imageUrl: {
+        type: String,
+        trim: true,       // Removes whitespace
+        validate: {
+            validator: function(v: string) {
+                // Basic URL validation
+                return !v || /^https?:\/\/.+/.test(v);
+            },
+            message: 'Invalid image URL format'
+        }
     },
     startDate: {
         type: Date,
@@ -58,6 +70,6 @@ const taskSchema = new Schema<ITask>({
     },
 });
 
-// Export the Task model, creating it only if it doesn’t already exist
+// Export the Task model, creating it only if it doesn't already exist
 const Task: Model<ITask> = mongoose.models.Task || mongoose.model<ITask>("Task", taskSchema);
 export default Task;

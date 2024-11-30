@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Logo from '@/app/components/Logo';
@@ -14,19 +15,21 @@ interface FormData {
     endDate: string;
     endTime: string;
     description: string;
+    imageUrl: string;
     allDay: boolean;
 }
 
 // Main component for editing a task
 export default function EditTask() {
     const router = useRouter();
-    const { id } = useParams(); // Extract task ID from the URL parameters
+    const { id } = useParams();
     const { data: session } = useSession();
 
-    const [error, setError] = useState<string | null>(null); // Error message state
-    const [isSubmitting, setIsSubmitting] = useState(false); // Submission loading state
-    const [isDeleting, setIsDeleting] = useState(false); // Deletion loading state
-    const [isLoading, setIsLoading] = useState(true); // Data loading state
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [imageError, setImageError] = useState(false);
 
     const [formData, setFormData] = useState<FormData>({
         title: '',
@@ -35,12 +38,10 @@ export default function EditTask() {
         endDate: '',
         endTime: '',
         description: '',
+        imageUrl: '',
         allDay: false,
     });
 
-    /**
-     * Fetch task data when the component mounts or the ID changes.
-     */
     useEffect(() => {
         const fetchTask = async () => {
             try {
@@ -62,6 +63,7 @@ export default function EditTask() {
                     endDate,
                     endTime: task.endTime,
                     description: task.description || '',
+                    imageUrl: task.imageUrl || '',
                     allDay: task.allDay,
                 });
             } catch (err) {
@@ -71,12 +73,9 @@ export default function EditTask() {
             }
         };
 
-        if (id) fetchTask(); // Fetch task only if the ID is defined
+        if (id) fetchTask();
     }, [id]);
 
-    /**
-     * Handle changes in form fields.
-     */
     const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
 
@@ -102,11 +101,13 @@ export default function EditTask() {
                 [name]: value,
             });
         }
+
+        // Reset image error when imageUrl changes
+        if (name === 'imageUrl') {
+            setImageError(false);
+        }
     };
 
-    /**
-     * Validate the form data before submission.
-     */
     const validateForm = () => {
         const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
         const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
@@ -119,9 +120,6 @@ export default function EditTask() {
         return true;
     };
 
-    /**
-     * Handle task deletion.
-     */
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this task?')) {
             return;
@@ -137,7 +135,6 @@ export default function EditTask() {
                 throw new Error('Failed to delete the task.');
             }
 
-            // Redirect to tasks page after successful deletion
             router.push('/tasks');
         } catch (err) {
             setError('Failed to delete task. Please try again later.');
@@ -145,20 +142,15 @@ export default function EditTask() {
         }
     };
 
-    /**
-     * Handle form submission for editing the task.
-     */
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
 
-        // Ensure the user is logged in
         if (!session?.user?.id) {
             setError('You must be logged in to edit tasks.');
             return;
         }
 
-        // Validate form data
         if (!validateForm()) {
             return;
         }
@@ -178,7 +170,6 @@ export default function EditTask() {
                 throw new Error('Failed to update task.');
             }
 
-            // Redirect to tasks page after successful update
             router.push('/tasks');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to update task. Please try again later.');
@@ -186,29 +177,23 @@ export default function EditTask() {
         }
     };
 
-    // Render a loading state while fetching data
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     }
 
     return (
         <div className="flex flex-col space-y-2.5 min-h-screen">
-            {/* Header section with logo */}
             <div className="flex flex-row p-1 justify-center items-center">
                 <Logo />
             </div>
             <hr style={{ height: '2px', backgroundColor: '#A8A8A7', border: 'none' }} />
 
-            {/* Main form container */}
             <div className="flex flex-grow p-10 space-x-5">
-                {/* Close button */}
                 <Link href="/tasks">
                     <p className="text-4xl cursor-pointer">×</p>
                 </Link>
 
-                {/* Task editing form */}
                 <form onSubmit={onSubmit} className="w-full max-w-[40%] space-y-4 text-left">
-                    {/* Task title input */}
                     <div className="flex flex-col space-y-2 text-3xl">
                         <input
                             type="text"
@@ -223,10 +208,8 @@ export default function EditTask() {
                     </div>
                     <hr className="w-full h-0.5 bg-[#232323] border-none" />
 
-                    {/* Start and end date/time inputs */}
                     <div className="flex items-center space-x-5">
                         <div className="flex space-x-2.5">
-                            {/* Start date and time */}
                             <input
                                 type="date"
                                 id="startDate"
@@ -248,7 +231,6 @@ export default function EditTask() {
                         </div>
                         <p>to</p>
                         <div className="flex space-x-2.5">
-                            {/* End date and time */}
                             <input
                                 type="date"
                                 id="endDate"
@@ -270,7 +252,6 @@ export default function EditTask() {
                         </div>
                     </div>
 
-                    {/* All-day checkbox */}
                     <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
@@ -283,7 +264,6 @@ export default function EditTask() {
                         <label htmlFor="allDay" className="cursor-pointer">All Day</label>
                     </div>
 
-                    {/* Event description */}
                     <div className="flex flex-col space-y-2 py-5">
                         <label className="font-bold text-3xl" htmlFor="description">Event Details</label>
                         <hr style={{ height: '2px', backgroundColor: '#232323', border: 'none' }} />
@@ -297,14 +277,43 @@ export default function EditTask() {
                         />
                     </div>
 
-                    {/* Error message */}
+                    <div className="flex flex-col space-y-2 py-5">
+                        <label className="font-bold text-3xl" htmlFor="imageUrl">Image URL</label>
+                        <hr style={{ height: '2px', backgroundColor: '#232323', border: 'none' }} />
+                        <textarea
+                            id="imageUrl"
+                            name="imageUrl"
+                            value={formData.imageUrl}
+                            onChange={onChange}
+                            placeholder="Edit image URL..."
+                            className="border border-[#232323] bg-[#E4E2DD] placeholder-[#232323] p-2 rounded h-32"
+                        />
+                        {formData.imageUrl && (
+                            <div className="relative w-full h-64 mt-4">
+                                <Image
+                                    src={formData.imageUrl}
+                                    alt="Task image"
+                                    width={500}
+                                    height={300}
+                                    style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                                    onError={() => setImageError(true)}
+                                    className={`rounded ${imageError ? 'hidden' : ''}`}
+                                    unoptimized
+                                />
+                                {imageError && (
+                                    <div className="w-full h-full flex items-center justify-center border border-red-500 rounded">
+                                        <p className="text-red-500">Failed to load image</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     {error && (
                         <div className="text-red-500 text-center">{error}</div>
                     )}
 
-                    {/* Action buttons */}
                     <div className="flex space-x-4">
-                        {/* Submit button */}
                         <button
                             type="submit"
                             disabled={isSubmitting}
@@ -314,7 +323,6 @@ export default function EditTask() {
                             {isSubmitting ? 'Saving...' : 'Save Changes'}
                         </button>
 
-                        {/* Delete button */}
                         <button
                             type="button"
                             onClick={handleDelete}
