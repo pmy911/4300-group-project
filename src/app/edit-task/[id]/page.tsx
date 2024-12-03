@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter, useParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Logo from '@/app/components/Logo';
+import TaskForm from '@/app/components/TaskForm';
 
-// Define the structure for the task form data
-interface FormData {
+// Define the shape of the task data expected by the form
+interface TaskData {
     title: string;
     startDate: string;
     startTime: string;
@@ -21,42 +19,28 @@ interface FormData {
 
 // Main component for editing a task
 export default function EditTask() {
-    const router = useRouter();
-    const { id } = useParams();
-    const { data: session } = useSession();
+    const { id } = useParams(); // Extract the 'id' parameter from the URL
+    const [initialData, setInitialData] = useState<TaskData | null>(null); // State to hold the initial task data
+    const [isLoading, setIsLoading] = useState(true); // Loading state for data fetching
+    const [error, setError] = useState<string | null>(null); // Error state for handling fetch errors
 
-    const [error, setError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [imageError, setImageError] = useState(false);
-
-    const [formData, setFormData] = useState<FormData>({
-        title: '',
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        description: '',
-        imageUrl: '',
-        allDay: false,
-    });
-
+    // useEffect hook to fetch the task data when the component mounts or when 'id' changes
     useEffect(() => {
         const fetchTask = async () => {
             try {
-                const response = await fetch(`/api/tasks/${id}`);
+                const response = await fetch(`/api/tasks/${id}`); // Fetch the task data from the API
                 if (!response.ok) {
                     throw new Error('Failed to fetch task data.');
                 }
 
-                const { task } = await response.json();
+                const { task } = await response.json(); // Parse the JSON response
 
-                // Format dates for form inputs
+                // Format the start and end dates to 'YYYY-MM-DD' format for the date input fields
                 const startDate = new Date(task.startDate).toISOString().split('T')[0];
                 const endDate = new Date(task.endDate).toISOString().split('T')[0];
 
-                setFormData({
+                // Set the initial data for the form, providing default empty strings if some fields are missing
+                setInitialData({
                     title: task.title,
                     startDate,
                     startTime: task.startTime,
@@ -67,274 +51,42 @@ export default function EditTask() {
                     allDay: task.allDay,
                 });
             } catch (err) {
-                setError('Failed to load task. Please try again later.');
+                setError('Failed to load task. Please try again later.'); // Set an error message if fetch fails
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); // Stop the loading state once fetching is done
             }
         };
 
-        if (id) fetchTask();
-    }, [id]);
+        if (id) fetchTask(); // Call fetchTask if 'id' is available
+    }, [id]); // Dependency array includes 'id' so it re-runs if 'id' changes
 
-    const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
-
-        if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
-            const checked = e.target.checked;
-
-            if (name === 'allDay') {
-                setFormData({
-                    ...formData,
-                    allDay: checked,
-                    startTime: checked ? '00:00' : '09:00',
-                    endTime: checked ? '23:59' : '17:00',
-                });
-            } else {
-                setFormData({
-                    ...formData,
-                    [name]: checked,
-                });
-            }
-        } else {
-            setFormData({
-                ...formData,
-                [name]: value,
-            });
-        }
-
-        // Reset image error when imageUrl changes
-        if (name === 'imageUrl') {
-            setImageError(false);
-        }
-    };
-
-    const validateForm = () => {
-        const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
-        const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
-
-        if (endDateTime <= startDateTime) {
-            setError('End time must be after start time.');
-            return false;
-        }
-
-        return true;
-    };
-
-    const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this task?')) {
-            return;
-        }
-
-        setIsDeleting(true);
-        try {
-            const response = await fetch(`/api/tasks/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete the task.');
-            }
-
-            router.push('/tasks');
-        } catch (err) {
-            setError('Failed to delete task. Please try again later.');
-            setIsDeleting(false);
-        }
-    };
-
-    const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError(null);
-
-        if (!session?.user?.id) {
-            setError('You must be logged in to edit tasks.');
-            return;
-        }
-
-        if (!validateForm()) {
-            return;
-        }
-
-        try {
-            setIsSubmitting(true);
-
-            const response = await fetch(`/api/tasks/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update task.');
-            }
-
-            router.push('/tasks');
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update task. Please try again later.');
-            setIsSubmitting(false);
-        }
-    };
-
+    // If data is still loading, display a loading message
     if (isLoading) {
         return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     }
 
+    // If there's an error, display the error message
+    if (error) {
+        return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
+    }
+
+    // Render the edit task form when initialData is available
     return (
         <div className="flex flex-col space-y-2.5 min-h-screen">
+            {/* Header section with the logo */}
             <div className="flex flex-row p-1 justify-center items-center">
                 <Logo />
             </div>
+            {/* Horizontal line separator */}
             <hr style={{ height: '2px', backgroundColor: '#A8A8A7', border: 'none' }} />
-
-            <div className="flex flex-grow p-10 space-x-5">
-                <Link href="/tasks">
-                    <p className="text-4xl cursor-pointer">×</p>
-                </Link>
-
-                <form onSubmit={onSubmit} className="w-full max-w-[40%] space-y-4 text-left">
-                    <div className="flex flex-col space-y-2 text-3xl">
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={formData.title}
-                            onChange={onChange}
-                            placeholder="Edit title"
-                            className="border border-transparent bg-[#E4E2DD] p-2 rounded placeholder-[#232323]"
-                            required
-                        />
-                    </div>
-                    <hr className="w-full h-0.5 bg-[#232323] border-none" />
-
-                    <div className="flex items-center space-x-5">
-                        <div className="flex space-x-2.5">
-                            <input
-                                type="date"
-                                id="startDate"
-                                name="startDate"
-                                value={formData.startDate}
-                                onChange={onChange}
-                                className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
-                                required
-                            />
-                            <input
-                                type="time"
-                                id="startTime"
-                                name="startTime"
-                                value={formData.startTime}
-                                onChange={onChange}
-                                className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
-                                required
-                            />
-                        </div>
-                        <p>to</p>
-                        <div className="flex space-x-2.5">
-                            <input
-                                type="date"
-                                id="endDate"
-                                name="endDate"
-                                value={formData.endDate}
-                                onChange={onChange}
-                                className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
-                                required
-                            />
-                            <input
-                                type="time"
-                                id="endTime"
-                                name="endTime"
-                                value={formData.endTime}
-                                onChange={onChange}
-                                className="border border-[#232323] bg-[#E4E2DD] p-2 rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            id="allDay"
-                            name="allDay"
-                            checked={formData.allDay}
-                            onChange={onChange}
-                            className="cursor-pointer"
-                        />
-                        <label htmlFor="allDay" className="cursor-pointer">All Day</label>
-                    </div>
-
-                    <div className="flex flex-col space-y-2 py-5">
-                        <label className="font-bold text-3xl" htmlFor="description">Event Details</label>
-                        <hr style={{ height: '2px', backgroundColor: '#232323', border: 'none' }} />
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={onChange}
-                            placeholder="Edit description..."
-                            className="border border-[#232323] bg-[#E4E2DD] placeholder-[#232323] p-2 rounded h-32"
-                        />
-                    </div>
-
-                    <div className="flex flex-col space-y-2 py-5">
-                        <label className="font-bold text-3xl" htmlFor="imageUrl">Image URL</label>
-                        <hr style={{ height: '2px', backgroundColor: '#232323', border: 'none' }} />
-                        <textarea
-                            id="imageUrl"
-                            name="imageUrl"
-                            value={formData.imageUrl}
-                            onChange={onChange}
-                            placeholder="Edit image URL..."
-                            className="border border-[#232323] bg-[#E4E2DD] placeholder-[#232323] p-2 rounded h-32"
-                        />
-                        {formData.imageUrl && (
-                            <div className="relative w-full h-64 mt-4">
-                                <Image
-                                    src={formData.imageUrl}
-                                    alt="Task image"
-                                    width={500}
-                                    height={300}
-                                    style={{ objectFit: 'contain', width: '100%', height: '100%' }}
-                                    onError={() => setImageError(true)}
-                                    className={`rounded ${imageError ? 'hidden' : ''}`}
-                                    unoptimized
-                                />
-                                {imageError && (
-                                    <div className="w-full h-full flex items-center justify-center border border-red-500 rounded">
-                                        <p className="text-red-500">Failed to load image</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {error && (
-                        <div className="text-red-500 text-center">{error}</div>
-                    )}
-
-                    <div className="flex space-x-4">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className={`flex-1 border border-[#232323] bg-[#E4E2DD] py-2 px-6 text-xl rounded
-                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'}`}
-                        >
-                            {isSubmitting ? 'Saving...' : 'Save Changes'}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={handleDelete}
-                            disabled={isDeleting}
-                            className={`border border-red-500 text-red-500 py-2 px-6 text-xl rounded
-                                ${isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-50'}`}
-                        >
-                            {isDeleting ? 'Deleting...' : 'Delete'}
-                        </button>
-                    </div>
-                </form>
-            </div>
+            {/* Render the TaskForm component with the fetched data */}
+            {initialData && (
+                <TaskForm
+                    mode="edit"                   // Set the form mode to 'edit'
+                    initialData={initialData}     // Pass the fetched task data as initial values
+                    taskId={id as string}         // Pass the task ID for identification
+                />
+            )}
         </div>
     );
 }
